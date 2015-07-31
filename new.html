@@ -55,20 +55,36 @@
 									</items>
 								</List>
 							</content>
+							<footer>
+								<Bar />
+							</footer>
 						</Page>
 						<Page id="detail"
 							showNavButton="true"
 							navButtonPress="onNavButtonPress"
 							title="{version} Patch levels ">
+							<subHeader>
+								<Bar>
+									<contentMiddle>
+										<Title
+											text="{support} {eom}" />
+									</contentMiddle>
+								</Bar>
+							</subHeader>
 							<content>
 								<List
 									items="{patches}">
 									<items>
 										<StandardListItem
+											type="Active"
+											press="onPatchPress"
 											title="Patch level {version}" />
 									</items>
 								</List>
 							</content>
+							<footer>
+								<Bar />
+							</footer>
 						</Page>
 					</pages>
 				</App>
@@ -218,6 +234,16 @@
 					this._oApp.back();
 				},
 
+				onPatchPress : function(oEvent) {
+					var sVersion = oEvent.getSource()
+						.getBindingContext()
+						.getProperty("version");
+					var sUrl = "https://sapui5.hana.ondemand.com/"
+							+ sVersion
+							+ "/versioninfo.html";
+					sap.m.URLHelper.redirect(sUrl, true);
+				},
+
 				fmEomTitle : function(sEom) {
 					return sEom ? "Until" : "";
 				},
@@ -228,9 +254,10 @@
 
 				fmSupportText : function(sSupport) {
 					return this.mSupport[sSupport].text || sSupport;
-				}
-				
+				},
+
 			});
+
 			sap.ui.xmlview({ viewContent: jQuery("#app").html() })
 				.placeAt("content");
 
