@@ -1,0 +1,311 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta charset="UTF-8" />
+		<title>Available SAPUI5 versions on SAP HANA Cloud Platform</title>
+		<link rel="stylesheet" type="text/css" href="theme/default.css"></link>
+		<style>	
+			.myDS.sapUiUx3DS,
+			.myDS.sapUiUx3DS .sapUiUx3DSSVItem:hover {
+				background-color: transparent;
+			}
+			.myDS.sapUiUx3DS .sapUiLnk,
+			.myDS.sapUiUx3DS .sapUiTv {
+				width: auto !important;
+			}
+			.myReleaseNotes {
+				height: 400px;
+				overflow: auto; 
+			}
+			
+			body .sapMListTbl .recommendedVersion span, body .sapMListTbl .recommendedVersion a {
+				font-weight: 800;
+			}
+			
+			body .sapMListTbl #versionsTable-tblBody tr td span.innovation, 
+			body .sapMListTbl #versionsTable-tblBody tr td span.stable, 
+			body .sapMListTbl #versionsTableBranches-tblBody tr td span.stable, 
+			body .sapMListTbl #versionsTableBranches-tblBody tr td span.innovation {
+				color: #007833;
+			}
+			
+			body .sapMListTbl #versionsTable-tblBody tr td span.outOfMaintenance,
+			body .sapMListTbl #versionsTableBranches-tblBody tr td span.outOfMaintenance {
+				color: #cc1919;
+			}
+			
+			.sapUiHLayoutChildWrapper {
+				padding: 0 5px;
+			}
+			
+			.sapUiHLayoutChildWrapper .sapUiIcon {
+				color: #00679e;
+			}
+			
+			body h1.title {
+				font-weight: 100;
+			}
+		</style>
+		<script 
+			id="sap-ui-bootstrap" type="text/javascript"
+			src="resources/sap-ui-core.js"
+			data-sap-ui-theme="sap_bluecrystal"
+			data-sap-ui-libs="sap.m">
+		</script>
+		<script>
+		// load neo-app.json file
+		var oNeoAppJson = {};
+		var sRecommendedVersion = '';
+		var oTableVersionsModel;
+		
+		// create UI 
+		var oTable = new sap.m.Table({
+			id: "versionsTableBranches",
+			columns: [
+				new sap.m.Column({
+					header: new sap.m.Label({
+						minScreenWidth: "Desktop",
+						text: "Version",
+						design: sap.m.LabelDesign.Bold
+					}),
+					demandPopin : true
+				}),
+				new sap.m.Column({
+					minScreenWidth: "Desktop",	
+					header: new sap.m.Label({
+						text: "Maintenance Status",
+						design: sap.m.LabelDesign.Bold
+					}),
+					demandPopin : true
+				}),
+				new sap.m.Column({
+					header: new sap.m.Label({
+						text: "End of Maintenace",
+						design: sap.m.LabelDesign.Bold
+					})
+				})
+			],
+			height: "100%"
+		}).bindItems({
+			path: "/",
+			template: new sap.m.ColumnListItem({
+				cells: [
+					new sap.m.Text({
+						text: "{version}"
+					}),
+					new sap.m.Text({
+						text: {
+							parts: ["support"],
+							formatter: function(support) {
+								switch(support) {
+									case "Stable": 
+										// supported versions are with @sapUiPositiveText
+										this.addStyleClass("stable");
+										return "Stable";
+										break;
+									case "Innovation": 
+										// supported versions are with @sapUiPositiveText
+										this.addStyleClass("innovation");
+										return "Innovation";
+										break;
+									case "Out of maintenance":
+										// out of maintenance versions are with @sapUiNegativeText
+										this.addStyleClass("outOfMaintenance");
+										return "Out of maintenance";
+										break;
+								}
+							}
+						}
+					}),
+					new sap.m.Text({
+						text: "{eom}"
+					})
+				]
+			})
+		});
+		
+		var oTableVersions = new sap.m.Table({
+			id: "versionsTable",
+			columns: [
+				new sap.m.Column({
+					header: new sap.m.Label({
+						minScreenWidth: "Desktop",
+						text: "Version",
+						design: sap.m.LabelDesign.Bold
+					}),
+					mergeDuplicates: true,
+					demandPopin : true
+				}),
+				new sap.m.Column({
+					header: new sap.m.Label({
+						minScreenWidth: "Desktop",
+						text: "Patches",
+						design: sap.m.LabelDesign.Bold
+					}),
+					demandPopin : true
+				})
+			],
+			height: "100%"
+		}).bindItems({
+			path: "/",
+			template: new sap.m.ColumnListItem({
+				cells: [
+					new sap.m.Text({
+						 text: "{branch}"
+					}),
+					new sap.m.Link({
+						text: {
+							parts: ["version"],
+							formatter: function(version) {
+								if (sRecommendedVersion === version) {
+									//recommended version to be bold
+									this.getParent().addStyleClass("recommendedVersion");
+									return version;
+								} else {
+									return version;
+								}
+							}
+						},
+						href: {
+							parts: ["version"],
+							formatter: function(version) {
+								return "/" + version + "/versioninfo.html";
+							}
+						}
+					})
+				]
+			})
+		});
+		
+		jQuery.ajax({
+			url: "neo-app.json",
+			dataType: "json",
+			error: function() {
+				sap.m.MessageBox.show("Error loading supported version data json.");
+			},
+			success: function(oData, sStatus, oXhr) {
+				oNeoAppJson = oData.routes;
+				loadVersionsJSON();
+			}
+		});
+		
+		function loadVersionsJSON() {
+			// load versions.json 
+			jQuery.ajax({
+				url: "versionoverview.json",
+				dataType: "json",
+				error: function() {
+					sap.m.MessageBox.show("Error loading supported version data json.");
+				},
+				success: function(oData, sStatus, oXhr) {
+					fnBindVersionSupport(oData.versions);
+				}
+			});	
+		}
+		
+		var fnBindVersionSupport = function bindVersionSupport(oVersions) {
+			var oConcatenatedJsonBranches = {
+				versions: []
+			};
+			
+			var oConcatenatedJsonVersions = {
+					versions: []
+			};
+			
+			var isFound = false;
+			// mapping between neo-app.json and versionoverview.json
+			for (var i = 0; i < oNeoAppJson.length; i++) {
+				for (var j = 0;j < oVersions.length - 1; j++) {
+					isFound = false;
+					var neoAppJsonVersion = oNeoAppJson[i].target.version.split(".")[0] + "." + oNeoAppJson[i].target.version.split(".")[1];
+					var versionsJson = oVersions[j].version.indexOf(">") >= 0 ? 
+							oVersions[j].version.split(".")[0].substring(1, 2) + "." + oVersions[j].version.split(".")[1] : 
+							oVersions[j].version.split(".")[0] + "." + oVersions[j].version.split(".")[1]; 
+					var neoAppJsonVersionFloat = new jQuery.sap.Version(neoAppJsonVersion);
+					var versionsJsonFloat = new jQuery.sap.Version(versionsJson);
+					
+					if(oNeoAppJson[i].path === "/") {
+						sRecommendedVersion = oNeoAppJson[i].target.version;
+					}
+					if((neoAppJsonVersionFloat.compareTo(versionsJsonFloat) >= 0 && !sRecommendedVersion) && oVersions[j].version.indexOf(">") >= 0) {
+						oConcatenatedJsonBranches.versions.push({"version" : neoAppJsonVersion, "support" : oVersions[j].support, "eom" : oVersions[j].eom});
+						oConcatenatedJsonVersions.versions.push({"branch" : neoAppJsonVersion, "version" : oNeoAppJson[i].target.version, "support" : oVersions[j].support});
+						isFound = true;
+						break;
+					} else if (oVersions[j].version.indexOf(">") < 0) {
+						if (neoAppJsonVersionFloat.compareTo(versionsJsonFloat) == 0) {
+							oConcatenatedJsonBranches.versions.push({"version" : neoAppJsonVersion, "support" : oVersions[j].support, "eom" : oVersions[j].eom});
+							oConcatenatedJsonVersions.versions.push({"branch" : neoAppJsonVersion, "version" : oNeoAppJson[i].target.version, "support" : oVersions[j].support});
+							isFound = true;
+							break;
+						}
+					}
+				}
+				
+				if(isFound == false && oNeoAppJson[i].path !== "/") {
+					oConcatenatedJsonBranches.versions.push({"version" : neoAppJsonVersion, "support" : oVersions[oVersions.length -1].support, "eom" : oVersions[j].eom});
+					oConcatenatedJsonVersions.versions.push({"branch" : neoAppJsonVersion, "version" : oNeoAppJson[i].target.version, "support" : oVersions[j].support});
+				}
+			}
+			
+			var arr = [];
+			var collection = [];
+
+			jQuery.each(oConcatenatedJsonBranches.versions, function (index, value) {
+				//check if id value not exits than add it
+				if (jQuery.inArray(value.version, arr) == -1) { 
+			 		//push id value in arr
+					arr.push(value.version);
+					//put object in collection to access it's all values
+					collection.push(value); 
+				}
+			});
+			
+			var oModel = new sap.ui.model.json.JSONModel(collection);
+			sap.ui.getCore().setModel(oModel);
+			
+			oTableVersionsModel = new sap.ui.model.json.JSONModel(oConcatenatedJsonVersions.versions);
+			
+			oTableVersions.setModel(oTableVersionsModel);
+		};
+		
+		// add filter for search
+		var oSearchField = new sap.m.SearchField({
+			liveChange: function (oEvt) {
+				var aFilters = [];
+				var sQuery = oEvt.getSource().getValue();
+				var oVersionFilter = new sap.ui.model.Filter("version", sap.ui.model.FilterOperator.Contains, sQuery); 
+				
+				aFilters.push(oVersionFilter);
+				
+				var oAllFilters = new sap.ui.model.Filter(aFilters);
+
+				// update list binding
+				var oTable = sap.ui.getCore().byId("versionsTable");
+				oTable.getBinding("items").filter(oAllFilters, sap.ui.model.FilterType.Control);
+			 }
+		}); 
+		
+		oSearchField.placeAt("search");
+		oTable.placeAt("branches");
+		oTableVersions.placeAt("versions");
+		
+		</script>
+	</head>
+
+	<body class="sapUiBody" role="application">
+		<h1 class="title">SAPUI5 Versions Maintenance Status</h1>
+		<div id="branches"></div>
+		<h1 class="title">Available SAPUI5 Versions on SAP HANA Cloud Platform</h1>
+		<div id="search"></div>
+		<div id="versions"></div>
+		<h5>
+			The updated SAPUI5 maintenance strategy for SAP HANA Cloud Platform is available in 
+			<a href="https://sapui5.hana.ondemand.com/docs/maintenancestrategy.pdf">
+				this document.
+			</a>
+		</h5>
+	</body>
+</html>
+

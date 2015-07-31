@@ -1,0 +1,279 @@
+{
+  "maven": {
+    "groupId": "com.sap.ui5.dist",
+    "artifactId": "sapui5-sdk-dist",
+    "version": "1.28.10",
+    "classifier": "static",
+    "type": "zip"
+  },
+  "welcomeFile": "index.html",
+  "authenticationMethod": "none",
+  "cacheControl": [
+    {
+      "maxAge": 604800
+    }
+  ],
+  "routes": [
+    {
+      "path": "/1.28.10",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.28.10",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.28.10"
+    },
+    {
+      "path": "/1.28.9",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.28.9",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.28.9"
+    },
+    {
+      "path": "/1.28.8",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.28.8",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.28.8"
+    },
+    {
+      "path": "/1.28.6",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.28.6",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.28.6"
+    },
+    {
+      "path": "/1.28.5",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.28.5",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.28.5"
+    },
+    {
+      "path": "/1.28.4",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.28.4",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.28.4"
+    },
+    {
+      "path": "/1.26.13",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.26.13",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.26.13"
+    },
+    {
+      "path": "/1.26.11",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.26.11",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.26.11"
+    },
+    {
+      "path": "/1.26.10",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.26.10",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.26.10"
+    },
+    {
+      "path": "/1.26.6",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.26.6",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.26.6"
+    },
+    {
+      "path": "/1.26.5",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.26.5",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.26.5"
+    },
+    {
+      "path": "/1.26.3",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.26.3",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.26.3"
+    },
+    {
+      "path": "/1.24.7",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.24.7",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.24.7"
+    },
+    {
+      "path": "/1.24.6",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.24.6",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.24.6"
+    },
+    {
+      "path": "/1.24.5",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.24.5",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.24.5"
+    },
+    {
+      "path": "/1.24.4",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.24.4",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.24.4"
+    },
+    {
+      "path": "/1.24.3",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.24.3",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.24.3"
+    },
+    {
+      "path": "/1.22.10",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.22.10",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.22.10"
+    },
+    {
+      "path": "/1.22.9",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.22.9",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.22.9"
+    },
+    {
+      "path": "/1.22.8",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.22.8",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.22.8"
+    },
+    {
+      "path": "/1.22.7",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.22.7",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.22.7"
+    },
+    {
+      "path": "/1.22.5",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.22.5",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.22.5"
+    },
+    {
+      "path": "/1.20.8",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.20.8",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.20.8"
+    },
+    {
+      "path": "/1.20.7",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.20.7",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.20.7"
+    },
+    {
+      "path": "/1.20.6",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.20.6",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.20.6"
+    },
+    {
+      "path": "/",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "version": "1.28.10",
+        "preferLocal": true
+      },
+      "description": "SAPUI5 1.28.10"
+    }
+  ],
+  "ui5CacheBuster": true
+}

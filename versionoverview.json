@@ -1,0 +1,19 @@
+{
+  "versions": [
+    {
+      "version": ">1.28.*",
+      "support": "Stable",
+      "eom": "Q1/2017"
+    },
+    {
+      "version": "1.22.*",
+      "support": "Stable",
+      "eom": "Q3/2015"
+    },
+    {
+      "version": "*",
+      "support": "Out of maintenance",
+      "eom": ""
+    }
+  ]
+}
