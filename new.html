@@ -1,0 +1,213 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta charset="UTF-8" />
+		<title>Available SAPUI5 versions on SAP HANA Cloud Platform</title>
+		<script 
+			id="sap-ui-bootstrap" type="text/javascript"
+			src="../resources/sap-ui-core.js"
+			data-sap-ui-theme="sap_bluecrystal"
+			data-sap-ui-xx-bindingSyntax="complex"
+			data-sap-ui-libs="sap.m">
+		</script>
+
+		<script id="app" type="ui5/xmlview">
+			<mvc:View
+				controllerName="local.controller.app"
+				displayBlock="true"
+				xmlns:mvc="sap.ui.core.mvc"
+				xmlns="sap.m">
+				<App>
+					<pages>
+						<Page
+							title="SAPUI5 Maintenance Status">
+							<content>
+								<List
+									items="{/}">
+									<items>
+										<ObjectListItem
+											title="{version}"
+											number="{patchCount}"
+											numberUnit="Patch levels">
+											<attributes>
+												<ObjectAttribute
+													title="{
+														path : 'eom',
+														formatter : '.fmEomTitle'
+													}"
+													text="{eom}" />
+											</attributes>
+											<firstStatus>
+												<ObjectStatus
+													text="{
+														path : 'support',
+														formatter : '.fmSupportText'
+													}"
+													state="{
+														path : 'support',
+														formatter : '.fmSupportState'
+													}" />
+											</firstStatus>
+										</ObjectListItem>
+									</items>
+								</List>
+							</content>
+						</Page>
+					</pages>
+				</App>
+			</mvc:View>
+		</script>
+		
+		<script>
+		// load neo-app.json file
+		var oNeoAppJson = {};
+		var sRecommendedVersion = '';
+		var oTableVersionsModel;
+		
+		jQuery.ajax({
+			url: "neo-app.json",
+			dataType: "json",
+			error: function() {
+				sap.m.MessageBox.show("Error loading supported version data json.");
+			},
+			success: function(oData, sStatus, oXhr) {
+				oNeoAppJson = oData.routes;
+				loadVersionsJSON();
+			}
+		});
+		
+		function loadVersionsJSON() {
+			// load versions.json 
+			jQuery.ajax({
+				url: "versionoverview.json",
+				dataType: "json",
+				error: function() {
+					sap.m.MessageBox.show("Error loading supported version data json.");
+				},
+				success: function(oData, sStatus, oXhr) {
+					fnBindVersionSupport(oData.versions);
+				}
+			});	
+		}
+		
+		var fnBindVersionSupport = function bindVersionSupport(oVersions) {
+
+			// Original data munging starts here
+
+			var oConcatenatedJsonBranches = {
+				versions: []
+			};
+			
+			var oConcatenatedJsonVersions = {
+					versions: []
+			};
+			
+			var isFound = false;
+			// mapping between neo-app.json and versionoverview.json
+			for (var i = 0; i < oNeoAppJson.length; i++) {
+				for (var j = 0;j < oVersions.length - 1; j++) {
+					isFound = false;
+					var neoAppJsonVersion = oNeoAppJson[i].target.version.split(".")[0] + "." + oNeoAppJson[i].target.version.split(".")[1];
+					var versionsJson = oVersions[j].version.indexOf(">") >= 0 ? 
+							oVersions[j].version.split(".")[0].substring(1, 2) + "." + oVersions[j].version.split(".")[1] : 
+							oVersions[j].version.split(".")[0] + "." + oVersions[j].version.split(".")[1]; 
+					var neoAppJsonVersionFloat = new jQuery.sap.Version(neoAppJsonVersion);
+					var versionsJsonFloat = new jQuery.sap.Version(versionsJson);
+					
+					if(oNeoAppJson[i].path === "/") {
+						sRecommendedVersion = oNeoAppJson[i].target.version;
+					}
+					if((neoAppJsonVersionFloat.compareTo(versionsJsonFloat) >= 0 && !sRecommendedVersion) && oVersions[j].version.indexOf(">") >= 0) {
+						oConcatenatedJsonBranches.versions.push({"version" : neoAppJsonVersion, "support" : oVersions[j].support, "eom" : oVersions[j].eom});
+						oConcatenatedJsonVersions.versions.push({"branch" : neoAppJsonVersion, "version" : oNeoAppJson[i].target.version, "support" : oVersions[j].support});
+						isFound = true;
+						break;
+					} else if (oVersions[j].version.indexOf(">") < 0) {
+						if (neoAppJsonVersionFloat.compareTo(versionsJsonFloat) == 0) {
+							oConcatenatedJsonBranches.versions.push({"version" : neoAppJsonVersion, "support" : oVersions[j].support, "eom" : oVersions[j].eom});
+							oConcatenatedJsonVersions.versions.push({"branch" : neoAppJsonVersion, "version" : oNeoAppJson[i].target.version, "support" : oVersions[j].support});
+							isFound = true;
+							break;
+						}
+					}
+				}
+				
+				if(isFound == false && oNeoAppJson[i].path !== "/") {
+					oConcatenatedJsonBranches.versions.push({"version" : neoAppJsonVersion, "support" : oVersions[oVersions.length -1].support, "eom" : oVersions[j].eom});
+					oConcatenatedJsonVersions.versions.push({"branch" : neoAppJsonVersion, "version" : oNeoAppJson[i].target.version, "support" : oVersions[j].support});
+				}
+			}
+			
+			var arr = [];
+			var collection = [];
+
+			jQuery.each(oConcatenatedJsonBranches.versions, function (index, value) {
+				//check if id value not exits than add it
+				if (jQuery.inArray(value.version, arr) == -1) { 
+			 		//push id value in arr
+					arr.push(value.version);
+					//put object in collection to access it's all values
+					collection.push(value); 
+				}
+			});
+
+
+
+
+
+			// Create a deep structure from the Version and Branch arrays.
+			var mVersionInfo = arr.map(function(sVersion) {
+
+				// Grab the first of multiple entries for the given version
+				// so we end up with something like this in mVersion
+				// {version: "1.28", support: "Stable", eom: "Q1/2017"}
+				var mVersion = oConcatenatedJsonBranches.versions.filter(function(m) {
+					return m.version === sVersion;
+				})[0];
+
+				// Add a new property 'patches' to contain an array of records
+				// representing the patch info
+				mVersion.patches = oConcatenatedJsonVersions.versions.filter(function(m) {
+					return m.branch === sVersion;
+				});
+				mVersion.patchCount = mVersion.patches.length;
+				return mVersion;
+
+			});
+
+			sap.ui.controller("local.controller.app", {
+				mSupport : {
+					"Stable" : { state : "Success" },
+					"Out of maintenance" : { state : "Error", text : "Ended" }
+				},
+
+				onInit : function(oEvent) {
+					this.getView().setModel(new sap.ui.model.json.JSONModel(mVersionInfo));
+				},
+
+				fmEomTitle : function(sEom) {
+					return sEom ? "Until" : "";
+				},
+
+				fmSupportState : function(sSupport) {
+					return this.mSupport[sSupport].state || "None";
+				},
+
+				fmSupportText : function(sSupport) {
+					return this.mSupport[sSupport].text || sSupport;
+				}
+				
+			});
+			sap.ui.xmlview({ viewContent: jQuery("#app").html() })
+				.placeAt("content");
+
+		};
+		
+		</script>
+
+	</head>
+
+	<body class="sapUiBody" role="application" id="content"></body>
+</html>
+
