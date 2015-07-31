@@ -18,7 +18,7 @@
 				displayBlock="true"
 				xmlns:mvc="sap.ui.core.mvc"
 				xmlns="sap.m">
-				<App>
+				<App id="app">
 					<pages>
 						<Page
 							title="SAPUI5 Maintenance Status">
@@ -27,6 +27,8 @@
 									items="{/}">
 									<items>
 										<ObjectListItem
+											type="Active"
+											press="onItemSelect"
 											title="{version}"
 											number="{patchCount}"
 											numberUnit="Patch levels">
@@ -50,6 +52,20 @@
 													}" />
 											</firstStatus>
 										</ObjectListItem>
+									</items>
+								</List>
+							</content>
+						</Page>
+						<Page id="detail"
+							showNavButton="true"
+							navButtonPress="onNavButtonPress"
+							title="{version} Patch levels ">
+							<content>
+								<List
+									items="{patches}">
+									<items>
+										<StandardListItem
+											title="Patch level {version}" />
 									</items>
 								</List>
 							</content>
@@ -182,8 +198,24 @@
 					"Out of maintenance" : { state : "Error", text : "Ended" }
 				},
 
+				_oView : null,
+				_oApp : null,
+
 				onInit : function(oEvent) {
-					this.getView().setModel(new sap.ui.model.json.JSONModel(mVersionInfo));
+					this._oView = this.getView();
+					this._oApp = this._oView.byId("app");
+					this._oView.setModel(new sap.ui.model.json.JSONModel(mVersionInfo));
+				},
+
+				onItemSelect : function(oEvent) {
+					var oItem = oEvent.getParameter("listItem") || oEvent.getSource();
+					var oPage = this._oView.byId("detail");
+					oPage.setBindingContext(oItem.getBindingContext());
+					this._oApp.to(oPage);
+				},
+
+				onNavButtonPress : function(oEvent) {
+					this._oApp.back();
 				},
 
 				fmEomTitle : function(sEom) {
